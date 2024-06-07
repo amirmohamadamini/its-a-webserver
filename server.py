@@ -1,17 +1,20 @@
 import socket
 
-HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
+HOST = "::"  # Standard loopback interface address (localhost) Listens on both IPv4 and IPv6
 PORT = 8002  # Port to listen on (non-privileged ports are > 1023)
 
 
 def send_response(conn: socket.socket, data: bytes, status_code: int):
-    res = (
-        f"HTTP/1.1 {status_code}\r\nContent-Length: {len(data)}\r\n\r\n{data}".encode()
+    response_header = (
+        f"HTTP/1.1 {status_code}\r\n"
+        f"Content-Length: {len(data.encode())}\r\n"
+        f"Server: its-a-webserver\r\n"
+        f"\r\n"
     )
-    conn.send(res)
+    response = response_header.encode() + data.encode()
+    conn.send(response)
 
-
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+with socket.socket(socket.AF_INET6, socket.SOCK_STREAM) as s:
     print(f"Listing at {HOST}:{PORT}")
     s.bind((HOST, PORT))
     s.listen()
